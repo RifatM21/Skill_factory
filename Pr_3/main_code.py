@@ -130,6 +130,8 @@ def analysis(data):  # Основная функция
                       'Cuisine Style', 'Price Range'], axis=1)
 
     # Создание dummy-переменных по 'City'
+    # Также были проверены dummy-переменные дял показателей 'Cuisine Style' и 'Price Range', данные переменные не
+    # повлияли на итоговое значение MAE, в связи с чем было решено не добавлять их
     data = pd.get_dummies(data, columns=['City'], dummy_na=True)
     return data
 
@@ -199,6 +201,6 @@ print(solution)
 print()
 
 # Сохраняем итоговый датасет
-# solution.to_csv('solution.csv', index=None)
+solution.to_csv('solution.csv', index=None)
 
 
