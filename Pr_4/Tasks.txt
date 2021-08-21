@@ -162,18 +162,18 @@ from
         join dst_project.airports ap on f.arrival_airport = ap.airport_code
 where
     ap.city = 'Anapa' and
-    f.scheduled_arrival between '20170101' and '20171231'
+    f.actual_arrival between '20170101' and '20171231'
 
 5.1.2
 select
     count(f.flight_id) Anapa_winter_2017_dep
 from
     dst_project.flights f
-        join dst_project.airports ap on f.arrival_airport = ap.airport_code
+        join dst_project.airports ap on f.departure_airport = ap.airport_code
 where
     ap.city = 'Anapa' and
-    f.scheduled_departure between '20170101' and '20170228' or
-    f.scheduled_departure between '20171201' and '20171231'
+    f.actual_departure between '20170101' and '20170228' or
+    f.actual_departure between '20171201' and '20171231'
 
 5.1.3
 select
