@@ -1,12 +1,227 @@
 4.1
-
 select
-    d.city
+    a.city
 from 
-    dst_project.airports d
+    dst_project.airports a
 group by 
-    d.city
+    a.city
 having
-    count(d.city) > 1
+    count(a.city) > 1
 
-4.2
+4.2.1
+select
+    count(distinct f.status) statuses_count
+from 
+    dst_project.flights f
+
+4.2.2
+select
+    count(f.status) departed_count
+from 
+    dst_project.flights f
+where
+    f.status = 'Departed'
+
+4.2.3
+select
+    count(s.aircraft_code) seats_773
+from 
+    dst_project.seats s
+where
+    s.aircraft_code = '773'
+
+4.2.4
+select
+    count(f.status) flights_arrived
+from 
+    dst_project.flights f
+where
+    f.status = 'Arrived' and
+    scheduled_arrival between '20170401' and '20170901'
+
+4.3.1
+select
+    count(f.status) flights_cancelled
+from 
+    dst_project.flights f
+where
+    f.status = 'Cancelled'
+
+4.3.2
+select
+    substring(a.model, 1, 6),
+    count(substring(a.model, 1, 6))
+from 
+    dst_project.aircrafts a
+where
+    substring(a.model, 1, 6) = 'Boeing' or
+    substring(a.model, 1, 6) = 'Airbus' or
+    substring(a.model, 1, 6) = 'Sukhoi'
+group by 1
+
+4.3.3
+select
+    substring(ap.timezone, 1, 4),
+    count(ap.timezone)
+from 
+    dst_project.airports ap
+group by
+    1
+order by
+    2 desc
+
+4.3.4
+select
+    f.flight_id,
+    f.actual_arrival - f.scheduled_arrival arrival_delay
+from 
+    dst_project.flights f
+where
+    f.actual_arrival notnull
+group by
+    1
+order by
+    2 desc
+limit
+    1
+
+4.4.1
+select
+    f.scheduled_departure
+from 
+    dst_project.flights f
+order by
+    1
+limit
+    1
+
+4.4.2
+select
+    (f.scheduled_arrival - f.scheduled_departure) flight_time
+from 
+    dst_project.flights f
+order by
+    1 desc
+limit
+    1
+
+4.4.3
+select
+    arrival_airport,
+    departure_airport,
+    (f.scheduled_arrival - f.scheduled_departure) flight_time
+from 
+    dst_project.flights f
+order by
+    3 desc
+
+4.4.4
+select
+    avg(f.scheduled_arrival - f.scheduled_departure) flight_time
+from 
+    dst_project.flights f
+
+4.5.1
+select
+    s.fare_conditions,
+    count(s.fare_conditions)
+from
+    dst_project.seats s
+where
+    s.aircraft_code = 'SU9'
+group by
+    1
+order by
+    2 desc
+
+4.5.2
+select
+    b.total_amount
+from
+    dst_project.bookings b
+order by
+    1
+limit
+    1
+
+4.5.3
+select
+    t.passenger_id,
+    bp.seat_no
+from
+    dst_project.tickets t
+        join dst_project.boarding_passes bp on t.ticket_no = bp.ticket_no
+where
+    t.passenger_id = '4313 788533'
+
+5.1.1
+select
+    count(f.flight_id) Anapa_arrivals
+from
+    dst_project.flights f
+        join dst_project.airports ap on f.arrival_airport = ap.airport_code
+where
+    ap.city = 'Anapa' and
+    f.scheduled_arrival between '20170101' and '20171231'
+
+5.1.2
+select
+    count(f.flight_id) Anapa_winter_2017_dep
+from
+    dst_project.flights f
+        join dst_project.airports ap on f.arrival_airport = ap.airport_code
+where
+    ap.city = 'Anapa' and
+    f.scheduled_departure between '20170101' and '20170228' or
+    f.scheduled_departure between '20171201' and '20171231'
+
+5.1.3
+select
+    count(f.flight_id) Anapa_cancelled
+from
+    dst_project.flights f
+        join dst_project.airports ap on f.departure_airport = ap.airport_code
+where
+    ap.city = 'Anapa' and
+    f.status = 'Cancelled'
+
+5.1.4
+select
+    count(not_Mos.flight_id) not_to_Mos_from_Anapa
+from
+    (
+        select
+            f.*
+        from dst_project.flights f
+            join dst_project.airports ap on f.arrival_airport = ap.airport_code
+        where
+            ap.city != 'Moscow'
+    ) not_Mos
+        join dst_project.airports ap on not_Mos.departure_airport = ap.airport_code
+where
+    ap.city = 'Anapa'
+
+5.1.5 !!!!
+select
+    distinct model_seats.model,
+    model_seats.seats_count
+from
+    (
+        select
+            ac.model,
+            s.aircraft_code,
+            count(s.seat_no) seats_count
+        from
+            dst_project.seats s
+                join dst_project.aircrafts ac on s.aircraft_code = ac.aircraft_code
+        group by
+            1, 2
+    ) model_seats,
+    dst_project.flights f
+        join dst_project.airports ap on f.departure_airport = ap.airport_code
+        join model_seats on f.aircraft_code = model_seats.aircraft_code
+where
+    ap.city = 'Anapa'
+order by
+    2 desc
+
