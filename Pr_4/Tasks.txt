@@ -1,0 +1,12 @@
+4.1
+
+select
+    d.city
+from 
+    dst_project.airports d
+group by 
+    d.city
+having
+    count(d.city) > 1
+
+4.2
