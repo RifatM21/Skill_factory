@@ -171,9 +171,9 @@ from
     dst_project.flights f
         join dst_project.airports ap on f.departure_airport = ap.airport_code
 where
-    ap.city = 'Anapa' and
-    f.actual_departure between '20170101' and '20170228' or
-    f.actual_departure between '20171201' and '20171231'
+    ap.city = 'Anapa'
+    and (date_part('year', actual_departure) = 2017)
+    and (date_part('month', actual_departure) IN (12, 1, 2))
 
 5.1.3
 select
