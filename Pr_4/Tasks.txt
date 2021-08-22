@@ -201,25 +201,25 @@ from
 where
     ap.city = 'Anapa'
 
-5.1.5 !!!!
+5.1.5 
 select
     distinct model_seats.model,
     model_seats.seats_count
 from
-    (
-        select
-            ac.model,
-            s.aircraft_code,
-            count(s.seat_no) seats_count
-        from
-            dst_project.seats s
-                join dst_project.aircrafts ac on s.aircraft_code = ac.aircraft_code
-        group by
-            1, 2
-    ) model_seats,
     dst_project.flights f
         join dst_project.airports ap on f.departure_airport = ap.airport_code
-        join model_seats on f.aircraft_code = model_seats.aircraft_code
+        join
+            (
+                select
+                    ac.model,
+                    s.aircraft_code,
+                    count(s.seat_no) seats_count
+                from
+                    dst_project.seats s
+                        join dst_project.aircrafts ac on s.aircraft_code = ac.aircraft_code
+                group by
+                    1, 2
+            ) model_seats on f.aircraft_code = model_seats.aircraft_code
 where
     ap.city = 'Anapa'
 order by
