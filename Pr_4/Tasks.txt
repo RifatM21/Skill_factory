@@ -65,10 +65,8 @@ select
     count(ap.timezone)
 from 
     dst_project.airports ap
-group by
-    1
-order by
-    2 desc
+group by 1
+order by 2 desc
 
 4.3.4
 select
@@ -78,32 +76,25 @@ from
     dst_project.flights f
 where
     f.actual_arrival notnull
-group by
-    1
-order by
-    2 desc
-limit
-    1
+group by 1
+order by 2 desc
+limit 1
 
 4.4.1
 select
     f.scheduled_departure
 from 
     dst_project.flights f
-order by
-    1
-limit
-    1
+order by 1
+limit 1
 
 4.4.2
 select
     (f.scheduled_arrival - f.scheduled_departure) flight_time
 from 
     dst_project.flights f
-order by
-    1 desc
-limit
-    1
+order by 1 desc
+limit 1
 
 4.4.3
 select
@@ -112,8 +103,7 @@ select
     (f.scheduled_arrival - f.scheduled_departure) flight_time
 from 
     dst_project.flights f
-order by
-    3 desc
+order by 3 desc
 
 4.4.4
 select
@@ -129,20 +119,16 @@ from
     dst_project.seats s
 where
     s.aircraft_code = 'SU9'
-group by
-    1
-order by
-    2 desc
+group by 1
+order by 2 desc
 
 4.5.2
 select
     b.total_amount
 from
     dst_project.bookings b
-order by
-    1
-limit
-    1
+order by 1
+limit 1
 
 4.5.3
 select
@@ -217,11 +203,9 @@ from
                 from
                     dst_project.seats s
                         join dst_project.aircrafts ac on s.aircraft_code = ac.aircraft_code
-                group by
-                    1, 2
+                group by 1, 2
             ) model_seats on f.aircraft_code = model_seats.aircraft_code
 where
     ap.city = 'Anapa'
-order by
-    2 desc
+order by 2 desc
 
