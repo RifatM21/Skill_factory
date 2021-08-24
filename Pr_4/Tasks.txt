@@ -3,8 +3,7 @@ select
     a.city
 from 
     dst_project.airports a
-group by 
-    a.city
+group by a.city
 having
     count(a.city) > 1
 
