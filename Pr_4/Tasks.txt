@@ -173,3 +173,60 @@ from
 where ap.city = 'Anapa'
 order by 2 desc
 
+Final dataset
+with 
+    flights as (
+    select *
+    from 
+        dst_project.flights f
+            left join dst_project.aircrafts ac on f.aircraft_code = ac.aircraft_code
+            left join 
+                (
+                    select
+                        s.aircraft_code,
+                        count(s.seat_no) seats_all
+                    from dst_project.seats s
+                    group by 1
+                ) model_seats on f.aircraft_code = model_seats.aircraft_code
+    ),
+    
+    tickets as (
+        select 
+            tf.flight_id,
+            sum(tf.amount) total_amount
+        from dst_project.ticket_flights tf
+        group by 1
+    ),
+    
+    ticket_type as (
+        select
+            tf.flight_id,
+            count(case when tf.fare_conditions = 'Economy' then tf.fare_conditions end) tickets_economy,
+            count(case when tf.fare_conditions = 'Business' then tf.fare_conditions end) tickets_business
+        from dst_project.ticket_flights tf
+        group by 1
+    )
+
+select
+    f.flight_id,
+    f.flight_no,
+    f.departure_airport,
+    ap.city,
+    f.model,
+    f.seats_all,
+    tt.tickets_economy,
+    tt.tickets_business,
+    t.total_amount,
+    f.actual_arrival,
+    f.actual_departure,
+    date_part('hour', f.actual_arrival - f.actual_departure) * 60 +
+    date_part('minute', f.actual_arrival - f.actual_departure) flight_time_min
+from
+    flights f
+        left join tickets t on t.flight_id = f.flight_id
+        left join ticket_type tt on  tt.flight_id = f.flight_id
+        left join dst_project.airports ap on f.arrival_airport = ap.airport_code
+where
+    departure_airport = 'AAQ'
+    and (date_trunc('month', f.scheduled_departure) in ('2017-01-01', '2017-02-01', '2017-12-01'))
+    and status not in ('Cancelled')
