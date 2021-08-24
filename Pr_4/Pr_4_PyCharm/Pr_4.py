@@ -5,7 +5,7 @@ import warnings
 from datetime import datetime
 warnings.simplefilter('ignore')
 
-
+# Функция для заполнения показателя fuel_price - цена топлива руб/кг в зависимости от месяца
 def fuel_cost_per_month(date):
     month = date.month
     if month == 1:
@@ -26,14 +26,29 @@ print(data.head(10))
 print('\nИнформация о датасете:')
 print(data.info())
 
+# Количество проданных билетов
 data['tickets_sold'] = data['tickets_economy'] + data['tickets_business']
+
+# Показатель загрузки рейса
 data['occupancy'] = round((data['tickets_sold'] / data['seats_all']), 2) * 100
+
+# Раход топлива в зависимости от самолёта
 data['fuel_consumption'] = data['model'].apply(lambda x: 43.34 if x == 'Boeing 737-300' else 28.34)
+
+# Перевод дат в формата datetime
 data['actual_departure'] = data['actual_departure'].apply(lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%SZ'))
 data['actual_arrival'] = data['actual_arrival'].apply(lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%SZ'))
+
+# Добавление показателя цен на топливо
 data['fuel_price'] = data['actual_departure'].apply(fuel_cost_per_month)
+
+# Добавленние показателя затрат на топливо
 data['fuel_costs'] = data['fuel_consumption'] * data['fuel_price'] * data['flight_time_min']
+
+# Прибыль с рейса
 data['profit'] = data['total_amount'] - data['fuel_costs']
+
+# Прибыль с рейса относительно себестоимости топлива
 data['profit_14%'] = data['total_amount'] * 0.14 - data['fuel_costs']
 
 print('\nПромежуточный датасет:')
