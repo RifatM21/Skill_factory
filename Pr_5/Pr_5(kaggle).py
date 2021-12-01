@@ -3,14 +3,10 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from itertools import combinations
-from scipy.stats import ttest_ind
 from sklearn.feature_selection import f_classif, mutual_info_classif
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import auc, roc_auc_score, roc_curve
 import warnings
 
