@@ -81,7 +81,8 @@ def pre_analysis(df, column, description, for_num_cols=True):
         plt.show()
 
 
-def calc_and_plot_roc(y_true, y_pred_proba):  # Функция для отрисовки ROC кривой
+# Функция для отрисовки ROC кривой
+def calc_and_plot_roc(y_true, y_pred_proba):  
     # Посчитать значения ROC кривой и значение площади под кривой AUC
     fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
     roc_auc = roc_auc_score(y_true, y_pred_proba)
@@ -96,6 +97,7 @@ def calc_and_plot_roc(y_true, y_pred_proba):  # Функция для отрис
     plt.show()
 
 
+# Функция обработки данных
 def analysis(data, train_mode=False):
     if train_mode:
         print('\nИнформация о датасете:')
