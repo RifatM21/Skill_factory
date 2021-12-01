@@ -17,6 +17,7 @@ import warnings
 warnings.simplefilter('ignore')
 
 
+# Функция замен дат на категорию месяца
 def seasons(date):
     date = date[2:5]
     if date == 'JAN':
