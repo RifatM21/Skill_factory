@@ -99,6 +99,6 @@ data_test['vendor'] = data_test['brand'].apply(vendor)
 
 data_test['Владельцы'] = data_test['Владельцы'].apply(lambda x: owners(x.replace('\xa0', ''))).astype(object)
 
-# data.to_csv('train_prepared.csv', index=False)
-# data_test.to_csv('test_prepared.csv', index=False)
+data.to_csv('train_prepared.csv', index=False)
+data_test.to_csv('test_prepared.csv', index=False)
 

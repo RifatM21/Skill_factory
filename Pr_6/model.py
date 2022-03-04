@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split, RandomizedSearchCV, KFold
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
@@ -90,10 +90,13 @@ def compute_metric(clf, X_train, y_train, X_test):
 
 pd.set_option('display.max_columns', None)
 
-data_test = pd.read_csv('test_prepared.csv')
+# В тренеровочном датасете целевая переменная price выражена в $ по текущему курсу ($ = 100 руб.)
 data = pd.read_csv('train_prepared.csv')
+data_test = pd.read_csv('test_prepared.csv')
 data_submission = pd.read_csv('sample_submission.csv')
 
+# Добавлние дополнительной строки, кузов которой есть в тестовом датасете, но в тренировочном его нет
+# Данные были получены вручную с другого сайта по продаже авто
 add = {'bodyType': 'фастбек', 'brand': 'nissan', 'color': 'коричневый', 'engineDisplacement': 2.7, 'enginePower': 179,
        'fuelType': 'бензин', 'mileage': 147000, 'model_name': 'nissan 280ZX', 'numberOfDoors': 3,
        'productionDate': 1980, 'vehicleTransmission': 'автоматическая', 'vendor': 'Япония', 'Владельцы': 2,
@@ -101,8 +104,6 @@ add = {'bodyType': 'фастбек', 'brand': 'nissan', 'color': 'коричне
        'complectation': 12}
 
 data = data.append(add, ignore_index=True)
-
-# В тренеровочном датасете целевая переменная price выражена в $ по текущему курсу ($ = 100 руб.)
 
 print(data.info())
 print()
@@ -120,11 +121,11 @@ data = data.drop(['model_name'], axis=1)
 data['price'] = data['price'].apply(lambda x: np.log(x))
 
 # Распределение целевой переменной (логарифмированной)
-# plt.figure(figsize=(12, 6))
-# sns.histplot(data=data, x='price')
-# plt.title('Распределние целевой переменной (цены)')
-# plt.xlabel('Price')
-# plt.show()
+plt.figure(figsize=(12, 6))
+sns.histplot(data=data, x='price')
+plt.title('Распределние целевой переменной (цены)')
+plt.xlabel('Price')
+plt.show()
 
 box_plot_list = ['brand', 'vendor', 'Привод', 'fuelType', 'Владельцы', 'Руль', 'ПТС']
 num_list = ['engineDisplacement', 'enginePower', 'mileage', 'numberOfDoors', 'productionDate', 'complectation', 'price']
@@ -133,13 +134,13 @@ bin_list = ['ПТС', 'Руль', 'Состояние']
 
 
 # Box-plot'ы для основных категориальных признаков
-# for feature in box_plot_list:
-#     plt.figure(figsize=(12, 7))
-#     sns.boxplot(data=data, x=feature, y='price')
-#     plt.title(f'{feature.capitalize()}-Price', fontsize=20)
-#     plt.xlabel(f'{feature.capitalize()}', fontsize=14)
-#     plt.ylabel('Price', fontsize=14)
-#     plt.show()
+for feature in box_plot_list:
+    plt.figure(figsize=(12, 7))
+    sns.boxplot(data=data, x=feature, y='price')
+    plt.title(f'{feature.capitalize()}-Price', fontsize=20)
+    plt.xlabel(f'{feature.capitalize()}', fontsize=14)
+    plt.ylabel('Price', fontsize=14)
+    plt.show()
 
 print("\nПо построенным box-plot'ам можно заметить, что немецкие авто стоят в среднем дороже остальных, самые дорогие\n"
       "машины марки - Mercedes. Также, у машин с полным приводом в среднем цена значительно выше, чем у других.\n"
@@ -149,9 +150,9 @@ print("\nПо построенным box-plot'ам можно заметить, 
 
 
 # Построим график корреляциия численных признаков
-# plt.figure(figsize=(12, 7))
-# sns.heatmap(data[num_list].corr(), annot=True, fmt='.1f')
-# plt.show()
+plt.figure(figsize=(12, 7))
+sns.heatmap(data[num_list].corr(), annot=True, fmt='.1f')
+plt.show()
 
 print('\nПо графику корреляций можно заметить, что год выпуска и пробег автомобиля сильно скоррелированы между собой,\n'
       'также оба эти показателя сильно скоррелированные с целевой переменной. Оставим более скоррелированный с\n'
@@ -208,18 +209,18 @@ print('MAPE for Random Forest Regression:', np.round(mape(y_test, y_pred_rfr) * 
 
 # Stacking
 
-# cv = KFold(n_splits=5, shuffle=True, random_state=42)
+cv = KFold(n_splits=5, shuffle=True, random_state=42)
 
-# stacked_features_train, stacked_features_test = generate_meta_features([
-#     LinearRegression(),
-#     RandomForestRegressor(n_estimators=1000, max_features='auto', max_depth=10, min_samples_leaf=5,
-#                           min_samples_split=2, bootstrap=True, random_state=42)],
-#     X_train, X_test, y_train, cv)
+stacked_features_train, stacked_features_test = generate_meta_features([
+    LinearRegression(),
+    RandomForestRegressor(n_estimators=1000, max_features='auto', max_depth=10, min_samples_leaf=5,
+                          min_samples_split=2, bootstrap=True, random_state=42)],
+    X_train, X_test, y_train, cv)
 
-# clf_stack = LinearRegression()
-# clf_stack.fit(stacked_features_train, y_train)
-# y_pred_stack = clf_stack.predict(stacked_features_test)
-# print('MAPE for stacking:', mape(y_test, y_pred_stack), '%')
+clf_stack = LinearRegression()
+clf_stack.fit(stacked_features_train, y_train)
+y_pred_stack = clf_stack.predict(stacked_features_test)
+print('MAPE for stacking:', mape(y_test, y_pred_stack), '%')
 
 # ==============================================================================
 # Predicting for kaggle test sample
@@ -228,9 +229,10 @@ data_kaggle = test_data_for_model(data_test)
 
 kaggle_pred = rfr.predict(data_kaggle)
 
-# kaggle_pred = np.reshape(kaggle_pred, (-1, 1))
-
 data_submission['price'] = kaggle_pred
+
+# Т.к цена была прологармированна, а также вычислялась в доллар по текущему курсу,
+# то необходимо их преобразовать обратно по курсу ($ = 74 руб. на 2020 год)
 data_submission['price'] = data_submission['price'].apply(lambda x: int(np.exp(x) * 74))
 
 data_submission.to_csv('data_submission.csv', index=False)
