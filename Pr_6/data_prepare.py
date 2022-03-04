@@ -30,6 +30,8 @@ pd.set_option('display.max_columns', None)
 data_test = pd.read_csv('test.csv')
 data = pd.read_csv('train.csv')
 
+# ================================================================================
+# Train data preparing
 data = data.drop(
     ['Статус', 'Кузов №', 'Количество месте', 'Запас хода', 'Количество мест', 'Налог', 'Обмен',
      'Класс автомобиля', 'Таможня'], axis=1
