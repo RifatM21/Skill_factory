@@ -3,20 +3,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from itertools import combinations
-from scipy.stats import ttest_ind
 from sklearn.feature_selection import f_classif, mutual_info_classif
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import auc, roc_auc_score, roc_curve
 import warnings
 
 warnings.simplefilter('ignore')
 
 
+# Функция замены дат на категорию месяца
 def seasons(date):
     date = date[2:5]
     if date == 'JAN':
@@ -84,7 +81,8 @@ def pre_analysis(df, column, description, for_num_cols=True):
         plt.show()
 
 
-def calc_and_plot_roc(y_true, y_pred_proba):  # Функция для отрисовки ROC кривой
+# Функция для отрисовки ROC кривой
+def calc_and_plot_roc(y_true, y_pred_proba):  
     # Посчитать значения ROC кривой и значение площади под кривой AUC
     fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
     roc_auc = roc_auc_score(y_true, y_pred_proba)
@@ -99,6 +97,7 @@ def calc_and_plot_roc(y_true, y_pred_proba):  # Функция для отрис
     plt.show()
 
 
+# Функция обработки данных
 def analysis(data, train_mode=False):
     if train_mode:
         print('\nИнформация о датасете:')
