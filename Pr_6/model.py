@@ -209,12 +209,12 @@ print('MAPE for Random Forest Regression:', np.round(mape(y_test, y_pred_rfr) * 
 
 # Stacking
 
-cv = KFold(n_splits=5, shuffle=True, random_state=42)
+cv = KFold(n_splits=5, shuffle=True, random_state=RAND)
 
 stacked_features_train, stacked_features_test = generate_meta_features([
     LinearRegression(),
     RandomForestRegressor(n_estimators=1000, max_features='auto', max_depth=10, min_samples_leaf=5,
-                          min_samples_split=2, bootstrap=True, random_state=42)],
+                          min_samples_split=2, bootstrap=True, random_state=RAND)],
     X_train, X_test, y_train, cv)
 
 clf_stack = LinearRegression()
@@ -227,7 +227,15 @@ print('MAPE for stacking:', mape(y_test, y_pred_stack), '%')
 
 data_kaggle = test_data_for_model(data_test)
 
-kaggle_pred = rfr.predict(data_kaggle)
+stacked_features_train, stacked_features_test = generate_meta_features([
+    LinearRegression(),
+    RandomForestRegressor(n_estimators=1000, max_features='auto', max_depth=10, min_samples_leaf=5,
+                          min_samples_split=2, bootstrap=True, random_state=RAND)],
+    X, data_kaggle.values, y, cv)
+
+clf_stack_kaggle = LinearRegression()
+clf_stack_kaggle.fit(stacked_features_train, y)
+kaggle_pred = clf_stack_kaggle.predict(stacked_features_test)
 
 data_submission['price'] = kaggle_pred
 
@@ -235,4 +243,4 @@ data_submission['price'] = kaggle_pred
 # то необходимо их преобразовать обратно по курсу ($ = 74 руб. на 2020 год)
 data_submission['price'] = data_submission['price'].apply(lambda x: int(np.exp(x) * 74))
 
-data_submission.to_csv('data_submission.csv', index=False)
+data_submission.to_csv('data_submission_stacking.csv', index=False)
